@@ -243,7 +243,27 @@ costs["a"] = 6
 costs["b"] = 2
 costs["fin"] = infinity
 
-#还需要一个
+#还需要一个存储父节点的散列表
+parents = {}
+parents["a"] = "start"
+parents["b"] = "start"
+parents["fin"] = None
+
+#最后需要一个数组，用于记录处理过的节点
+processed = {}
+
+node = find_lowest_cost_node(costs) #找出开销最小的节点
+while node is not None: #处理所有节点
+  cost = costs[node]
+  neighbors = graph[node]
+  for n in neighbors.keys(): #遍历当前所有节点的邻居
+    new_cost = cost + neighbors[n]
+    if costs[n] > new_cost: #如果经当前节点前往该邻居更近，就更新该邻居的开销；同时将该邻居的父节点标记为处理过
+      costs[n] = new_cost
+      parents[n] = node
+  processsed.append(node)
+  node = find_lowest_cost_node(costs) #找出接下来要处理的节点并循环
+  
 ```
 
 简单的机器学习算法：  
