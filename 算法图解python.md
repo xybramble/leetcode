@@ -129,8 +129,43 @@ def quicksort(array):
 快速排序的性能高度依赖于所选择的基准值。最佳情况下，调用栈的高度为O(logn)，每层需要的时间为O(n)，因此整个算法需要的时间为O(n)\*O(logn)=O(nlogn).  
 
 ## 第九章 问题解决技巧：动态规划  
-如果没有高效的解决方案，使用：  
+如果没有高效的解决方案，使用贪婪算法（第八章）。  
+
 ## 第八章 贪婪算法  
+常见：背包问题。  
+例子：  
+找出覆盖50个州的最小广播台集合：  
+（1）列出每个**可能的广播台集合**，即幂集power set，可能的子集有2的n次方个。运行时间为O(2的n次方)。  
+（2）在这些集合中，选出覆盖50个州的最小集合。  
+使用**近似算法approximation algorithm**可以得到与贪婪算法接近的解。  
+```python
+states_needed = set(["mt", "wa", "or", "id", "nv", "ut", "ca", "az"])
+stations = {}
+stations["kone"] = set(["id", "nv", "ut"])
+stations["ktwo"] = set(["wa", "id", "mt"])
+stations["kthree"] = set(["or", "nv", "ca"])
+stations["kfour"] = set(["nv", "ut"])
+stations["kfive"] = set(["ca", "az"]) #键为广播台的名称，值为广播台覆盖的州
+final_stations = set() #存储最终选择的广播台
+
+while states_needed: #循环直到states_needed为空
+  best_station = None
+  states_covered = set()
+  for station, states_for_station in stations.items():
+    covered = states_needed & states_for_station #covered包含当前广播台覆盖的一系列还未覆盖的州
+    if len(covered) > len(states_covered):
+      best_station = station
+      states_covered = covered
+states.needed -= states_covered #由于该广播台覆盖了一些州，因此不用再覆盖这些州
+final_stations.add(best_station) #在for循环结束后将best_station添加到最终的广播台列表中
+
+print(final_stations)
+```
+![](scripts/精确算法与贪婪算法.png)  
+
+例子：旅行商问题  
+】
+
 
 当需要解决问题时，首先想到是否可以用散列表或用图来建立模型。  
 ## 第五章 散列表  
@@ -264,6 +299,15 @@ while node is not None: #处理所有节点
   processsed.append(node)
   node = find_lowest_cost_node(costs) #找出接下来要处理的节点并循环
   
+def find_lowest_cost_node(costs):
+  lowest_cost = float("inf")
+  lowest_cost_node = None
+  for node in costs:
+    cost = costs[node]
+    if cost < lowest_cost and node not in processed:
+      lowest_cost = cost
+      lowest_cost_node = node
+  return lowest_cost_node
 ```
 
 简单的机器学习算法：  
