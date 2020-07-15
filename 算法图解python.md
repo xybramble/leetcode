@@ -130,8 +130,44 @@ def quicksort(array):
 
 ## 第九章 问题解决技巧：动态规划  
 如果没有高效的解决方案，使用贪婪算法（第八章）。  
-
+动态规划是将问题分成小问题，并先着手解决这些小问题。  
+每个动态规划算法都从一个网格开始：  
+![](scripts/动态规划网格.png)  
+网格最初是空的，当网格填满后，就找到了问题的答案。  
+计算小背包可装入的商品的最大价值的原因 -- 余下了空间时，可根据这些子问题的答案来确定余下的空间可装入哪些商品。  
+![](scripts/动态规划网格终.png)  
+![](scripts/动态规划公式.png)  
+使用这个公式来计算每个单元格的价值，最终的网格将与前一个网格相同。  
+各行的排列顺序无关紧要。  
+使用动态规划时，要么考虑拿走整件商品，要么考虑不拿，没法判断该不该拿走商品的一部分。但贪婪算法可以轻松地处理这种情况。  
+注意：仅当每个子问题都是离散的，即不依赖于其他子问题时，动态规划才管用。  
+  
+确定解决问题的网格：
+1.单元格中的值  
+2.如何将这个问题划分为子问题  
+3.网格的坐标轴  
+  
+例子：寻找最长公共子串  
+实现公式的伪代码：  
+```python
+if word_a[i] == word_b[j]:
+  cell[i][j] = cell[i-1][j-1] + 1
+else:
+  cell[i][j] = 0
+```
+对于这个问题，这个问题的最终答案不在最后一个单元格中；而背包问题最终答案总是在最后的单元格中。  
+  
+例子：寻找最长公共子序列  
+```python
+if word_a[i] == word_b[j]:
+  cell[i][j] = cell[i-1][j-1] + 1
+else:
+  cell[i][j] = max(cell[i-1][j], cell[i][j-1])
+```
+应用：编辑距离levenshtein distance指出了两个字符串的相似程度，也是使用动态规划计算得到的。  
+  
 ## 第八章 贪婪算法  
+贪婪算法的优点 -- 简单易行，每步都选择最优的做法  
 常见：背包问题。  
 例子：  
 找出覆盖50个州的最小广播台集合：  
@@ -139,6 +175,7 @@ def quicksort(array):
 （2）在这些集合中，选出覆盖50个州的最小集合。  
 使用**近似算法approximation algorithm**可以得到与贪婪算法接近的解。  
 ```python
+#1.准备工作
 states_needed = set(["mt", "wa", "or", "id", "nv", "ut", "ca", "az"])
 stations = {}
 stations["kone"] = set(["id", "nv", "ut"])
@@ -148,11 +185,13 @@ stations["kfour"] = set(["nv", "ut"])
 stations["kfive"] = set(["ca", "az"]) #键为广播台的名称，值为广播台覆盖的州
 final_stations = set() #存储最终选择的广播台
 
+#2.计算答案
 while states_needed: #循环直到states_needed为空
+#正确的解可能有多个，需要遍历所有的广播台，从中选择覆盖了最多的未覆盖州的广播台
   best_station = None
-  states_covered = set()
+  states_covered = set()  #集合，包含该广播台覆盖的所有未覆盖的州
   for station, states_for_station in stations.items():
-    covered = states_needed & states_for_station #covered包含当前广播台覆盖的一系列还未覆盖的州
+    covered = states_needed & states_for_station #计算交集；交集类似于列表，只是不能包含重复的元素；covered包含当前广播台覆盖的一系列还未覆盖的州
     if len(covered) > len(states_covered):
       best_station = station
       states_covered = covered
@@ -164,9 +203,16 @@ print(final_stations)
 ![](scripts/精确算法与贪婪算法.png)  
 
 例子：旅行商问题  
-】
-
-
+阶乘函数factorial function：5!=120  
+旅行商问题和集合覆盖问题有一些共同之处：需要计算所有的解，并从中选出最小/最短的那个。  
+  
+例子：使用近似算法组建球队  
+（1）找出符合最多要求的球员。  
+（2）不断重复这个过程，直到球队满足要求/球队名额已满。  
+  
+![](scripts/NP完全问题判断.png)  
+面临NP完全问题时，最佳的做法是使用近似算法；贪婪算法易于实现，运行速度快，是不错的近似算法。  
+  
 当需要解决问题时，首先想到是否可以用散列表或用图来建立模型。  
 ## 第五章 散列表  
 如果本子内容是按字母顺序排序的（即有序列表），就可以使用二分查找来找出苹果的价格。  
@@ -309,7 +355,15 @@ def find_lowest_cost_node(costs):
       lowest_cost_node = node
   return lowest_cost_node
 ```
+广度优先搜索 -- 非加权图  
+迪克斯特拉算法（权重为正） -- 加权图  
+贝尔曼-福德算法（权重为负） -- 加权图  
 
 简单的机器学习算法：  
 ## 第十章 KNN算法  
 可用于创建推荐系统、OCR引擎、预测股价或其他值，或对物件进行分类。  
+OCR optical character recognition 光学字符识别：  
+（1）浏览大量的数字图像，将这些数字的特征提取出来；  
+（2）遇到新图像时，提取该图像的特征，再找出它最近的邻居都是谁。  
+一般而言，OCR算法提取线段、点和曲线等特征。  
+OCR的第一步是查看大量的数字图像并提取特征，这被称为训练training. 大多数
